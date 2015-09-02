@@ -12,24 +12,23 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 }
 
 public int Native_RegisterRPC(Handle plugin, int numParams) {
-  char fName[129];
+  decl String:fName[129];
   GetNativeString(1, fName, sizeof(fName));
   RegisterNewMethod(plugin, fName);
 }
 
 public int Native_CallRemoteProcedure(Handle plugin, int numParams) {
-  char server[129];
+  decl String:server[129];
   GetNativeString(1, server, sizeof(server));
-  char fName[129];
+  decl String:fName[129];
   GetNativeString(2, fName, sizeof(fName));
-  PrintToServer("Calling method %s on server %s", fName, server);
   RPCArguments argPack = view_as<RPCArguments>(GetNativeCell(3));
   if(argPack != INVALID_HANDLE) {
     argPack = view_as<RPCArguments>(CloneHandle(argPack));
   }
 
-  char argString[2048];
-  argPack.dump(argString, sizeof(argString));
+  decl String:argString[2048];
+  argPack.dump(argString, sizeof(argString), 0);
   argPack.Close();
 
   PrintToServer(argString);

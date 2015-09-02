@@ -51,11 +51,11 @@ public void SignAndSend(Socket socket, const char[] data) {
   message.putString("data", b64);
   message.putString("signature", signature);
 
-  char sMessage[1024];
-  message.dump(sMessage, sizeof(sMessage));
-  socket.Send(sMessage, sizeof(sMessage));
-
+  decl String:sMessage[2048];
+  int length = message.dump(sMessage, sizeof(sMessage));
   message.Close();
+
+  socket.Send(sMessage, length);
 }
 
 public void SendError(Socket socket, RPCError err) {
@@ -74,8 +74,8 @@ public void SendError(Socket socket, RPCError err) {
       error = errorNoSuchMethod("foo");
     }
   }
-  char res[256];
-  error.dump(res, 256);
+  decl String:res[256];
+  error.dump(res, sizeof(res));
   error.Close();
 
   SignAndSend(socket, res);

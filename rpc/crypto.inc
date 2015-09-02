@@ -41,8 +41,8 @@ public void HS512(const char[] message, const char[] key, char[] output, int max
     }
   }
 
-  int i_pad_len = 129 + strlen(message);
-  char[] i_pad_msg = new char[i_pad_len];
+  int i_pad_len = 128 + strlen(message);
+  decl String:i_pad_msg[i_pad_len];
   strcopy(i_pad_msg, 128, i);
   StrCat(i_pad_msg, i_pad_len, message);
 

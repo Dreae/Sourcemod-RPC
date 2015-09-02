@@ -75,6 +75,8 @@ public void FireMessage(Socket socket, DataPack pack) {
   ArrayStack stack = view_as<ArrayStack>(pack.ReadCell());
   decl String:buffers[stringCount][512];
   decl String:buffer[bufSize];
+  buffer[0] = '\0';
+
   for(int c = stringCount - 1; c >= 0; c--) {
     stack.PopString(buffers[c], 512);
   }
@@ -83,6 +85,7 @@ public void FireMessage(Socket socket, DataPack pack) {
   for(int c = 0; c < stringCount; c++) {
     StrCat(buffer, bufSize, buffers[c]);
   }
+
   pack.Reset();
   pack.WriteCell(0);
   pack.WriteCell(new ArrayStack(512));
