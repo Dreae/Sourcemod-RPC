@@ -31,6 +31,17 @@ public void NewMessage(Socket socket, const char[] receiveData, const int dataSi
     SendError(socket, RPCError_SignatureInvalid);
     return;
   }
+  decl String:sJsonData[4096];
+  DecodeBase64(sJsonData, sizeof(sJsonData), msgData);
+  JsonObject jsonData = view_as<JsonObject>(json_load(sJsonData));
+  Handle result = jsonData.get("result");
+  if(result != INVALID_HANDLE) {
+
+  } else {
+    decl String:method[129];
+    jsonData.getString("method", method, sizeof(method));
+    JsonArray args = view_as<JsonArray>(jsonData.get("params"));
+  }
 
   SendError(socket, RPCError_NoSuchMethod);
 }

@@ -60,36 +60,21 @@ public OnChildSocketReceive(Handle socket, String:receiveData[], const dataSize,
 }
 
 public OnChildSocketDisconnected(Handle socket, any hFile) {
-  CloseHandle(socket);
+  socket.Close();
+  if(arg != INVALID_HANDLE) {
+    DataPack pack = view_as<DataPacK>(arg);
+    pack.ReadCell();
+    ArrayStack stack = view_as<ArrayStack>(pack.ReadCell());
+    pack.Close();
+    if(stack != INVALID_HANDLE) {
+      stack.Close();
+    }
+  }
 }
 
 public OnChildSocketError(Handle socket, const int errorType, const int errorNum, any arg) {
   LogError("child socket error %d (errno %d)", errorType, errorNum);
   CloseHandle(socket);
-}
-
-public OnSendSocketConnected(Handle socket, any arg) {
-  Socket sock = view_as<Socket>(socket);
-  JsonObject request = view_as<JsonObject>(arg);
-  decl String:buffer[2048];
-  request.dump(buffer, sizeof(buffer), 0);
-  
-  decl String:sMessage[4096];
-  int length = Sign(buffer, sMessage, sizeof(sMessage));
-
-  sock.Send(sMessage, length);
-  request.Close();
-}
-
-public OnSendSocketReceive(Handle socket, char[] receiveData, const int dataSize, any arg) {
-
-}
-
-public OnSendSocketDisconnected(Handle socket, any arg) {
-  socket.Close();
-  if(arg != INVALID_HANDLE) {
-    CloseHandle(arg);
-  }
 }
 
 public void FireMessage(Socket socket, DataPack pack) {
@@ -116,10 +101,28 @@ public void FireMessage(Socket socket, DataPack pack) {
   NewMessage(socket, buffer, bufSize);
 }
 
+public OnSendSocketConnected(Handle socket, any arg) {
+  Socket sock = view_as<Socket>(socket);
+  JsonObject request = view_as<JsonObject>(arg);
+  decl String:buffer[2048];
+  request.dump(buffer, sizeof(buffer), 0);
+  request.Close();
+
+  DataPack pack = new DataPack();
+  pack.WriteCell(0);
+  pack.WriteCell(new ArrayStack(512));
+  sock.SetArg(pack);
+
+  decl String:sMessage[4096];
+  int length = Sign(buffer, sMessage, sizeof(sMessage));
+
+  sock.Send(sMessage, length);
+}
+
 public Socket SendTo(const char[] address, int port, JsonObject request) {
   Socket socket = view_as<Socket>(SocketCreate(SOCKET_TCP, OnSocketError));
   socket.SetArg(request);
-  SocketConnect(socket, OnSendSocketConnected, OnSendSocketReceive, OnSendSocketDisconnected, address, port);
+  SocketConnect(socket, OnSendSocketConnected, OnChildSocketReceive, OnChildSocketDisconnected, address, port);
 }
 
 public void substr(const char[] source, char[] dest, int startIndex, int endIndex) {
