@@ -2,7 +2,7 @@
 
 StringMap methods;
 
-public void initStringMap() {
+public void initMethodMap() {
   methods = new StringMap();
 }
 

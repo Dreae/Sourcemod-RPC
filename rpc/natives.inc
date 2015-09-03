@@ -1,6 +1,8 @@
 #include <sourcemod>
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max) {
+  initMethodMap();
+
   CreateNative("RegisterRPC", Native_RegisterRPC);
   CreateNative("CallRemoteProcedure", Native_CallRemoteProcedure);
 
@@ -9,6 +11,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
   CreateNative("ArgPackPushFloat", Native_ArgPackPushFloat);
   CreateNative("ArgPackPushString", Native_ArgPackPushString);
   CreateNative("ArgPackPushBool", Native_ArgPackPushBool);
+
+  return APLRes_Success;
 }
 
 public int Native_RegisterRPC(Handle plugin, int numParams) {

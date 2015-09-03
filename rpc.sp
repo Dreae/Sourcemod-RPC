@@ -13,16 +13,17 @@ ConVar CVar_RPC_SigningKey;
 #include "rpc/jsonrpc"
 #include "rpc/socket"
 #include "rpc/methods"
+#include "rpc/servers"
 #include "rpc/natives"
 
 #pragma newdecls optional
 
 public Plugin myinfo = {
-	name = "RPC",
-	author = "Dreae",
-	description = "Library for making RPCs",
-	version = "0.0.1",
-	url = ""
+  name = "RPC",
+  author = "Dreae",
+  description = "Library for making RPCs",
+  version = "0.0.1",
+  url = ""
 };
 
 public void OnPluginStart() {
@@ -38,6 +39,7 @@ public void OnPluginStart() {
   CVar_RCP_Port.AddChangeHook(ConfigCVarChanged);
 
   Sock_OpenRPCSocket();
+  loadServers();
 }
 
 public void EnabledCVarChanged(ConVar cvar, const char[] oldValue, const char[] newValue) {

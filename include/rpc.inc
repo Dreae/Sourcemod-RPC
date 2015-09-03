@@ -18,12 +18,17 @@ methodmap JsonObject < JsonValue {
     return view_as<JsonObject>(json_object());
   }
   public put() = json_object_set_new;
+  public get() = json_object_get;
+
   public void putString(const char[] key, const char[] value) {
     this.put(key, json_string(value));
   }
   public void putInt(const char[] key, int value) {
     this.put(key, json_integer(value));
   }
+
+  public getString() = json_object_get_string;
+  public getInt() = json_object_get_int;
 }
 
 methodmap JsonArray < JsonValue {

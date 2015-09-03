@@ -9,6 +9,7 @@ enum RPCError {
 };
 
 public void NewMessage(Socket socket, const char[] receiveData, const int dataSize) {
+ //TODO: Convert this to use json_load_ex()
   Handle wrapper = json_load(receiveData);
   if(wrapper == INVALID_HANDLE) {
     SendError(socket, RPCError_ParseError);
@@ -34,7 +35,7 @@ public void NewMessage(Socket socket, const char[] receiveData, const int dataSi
   SendError(socket, RPCError_NoSuchMethod);
 }
 
-public void SignAndSend(Socket socket, const char[] data) {
+public int Sign(const char[] data, char[] buffer, int maxlen) {
   int dataLen = strlen(data);
   int est = RoundToCeil(FloatMul(4.0, FloatDiv(float(dataLen), 3.0)));
   int total = est + (4 - (est % 4)) + 1;
@@ -51,9 +52,14 @@ public void SignAndSend(Socket socket, const char[] data) {
   message.putString("data", b64);
   message.putString("signature", signature);
 
-  decl String:sMessage[2048];
-  int length = message.dump(sMessage, sizeof(sMessage));
+  int length = message.dump(buffer, maxlen, 0);
   message.Close();
+  return length;
+}
+
+public void SignAndSend(Socket socket, const char[] data) {
+  decl String:sMessage[2048];
+  int length = Sign(data, sMessage, sizeof(sMessage));
 
   socket.Send(sMessage, length);
 }
@@ -75,7 +81,7 @@ public void SendError(Socket socket, RPCError err) {
     }
   }
   decl String:res[256];
-  error.dump(res, sizeof(res));
+  error.dump(res, sizeof(res), 0);
   error.Close();
 
   SignAndSend(socket, res);
